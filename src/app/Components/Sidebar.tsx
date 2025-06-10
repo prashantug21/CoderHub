@@ -9,6 +9,7 @@ import { useAppSelector } from '@/lib/hooks'
 const Sidebar = () => {
   const [isOpen, setIsOpen] = React.useState(false)
   const { isSignedIn, username, isLoaded } = useAppSelector((state: any) => state.signedIn);
+  
   return (
     <div className='flex flex-col gap-16 relative'>
       <button
@@ -40,7 +41,7 @@ const Sidebar = () => {
         </span>
       </button>
       <div className={`flex flex-col gap-4 
-          absolute top-16 left-[-16] 
+          absolute top-16 left-[] 
           bg-white p-4 rounded-lg 
           shadow-[8px_8px_0px_0px_rgba(0,0,0)] 
           border-black border-solid border-2

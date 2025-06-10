@@ -15,7 +15,7 @@ export async function GET(req: NextRequest ) {
         if (!user) {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
         }
-        const res= await sql`SELECT h.* , u.* FROM friends0 f JOIN handles h on f.friend_id = h.id JOIN users u on f.friend_id = u.id WHERE id = ${user.id}`;
+        const res= await sql`SELECT h.* , u.* FROM friends0 f JOIN handles h on f.friend_id = h.id JOIN users u on f.friend_id = u.id WHERE f.id = ${user.id}`;
         return NextResponse.json(res, { status: 200 });
     } catch (error) {
         return NextResponse.json({ message: "Internal server error" }, { status: 500 });
@@ -61,8 +61,10 @@ export async function POST(req: NextRequest) {
     }
 }
 
-export async function DELETE(req: NextRequest,{ params }: { params: { friendId: string } }) {
+export async function DELETE(req: NextRequest) {
     try {
+      const { searchParams } = new URL(req.url);
+  const params = Object.fromEntries(searchParams.entries());
         const user = await currentUser();
         if (!user) {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
