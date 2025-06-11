@@ -1,5 +1,5 @@
 import { CodeChefData } from "@/types/model";
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState :CodeChefData= {
   handle: null,

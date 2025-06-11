@@ -42,7 +42,7 @@ export default function FriendsPage() {
                         className="flex items-center justify-between bg-white border rounded-lg shadow p-4"
                     >
                         <div className="flex items-center gap-4">
-                            <img
+                            <Image
                                 src={friend.avatar || "/default-avatar.png"}
                                 alt={friend.username}
                                 className="w-12 h-12 rounded-full object-cover border"

@@ -3,19 +3,17 @@ import React, { useEffect, useState } from 'react'
 import Loader from '../Components/Loader'
 import { redirect } from 'next/navigation'
 import { useGetHandlesQuery, useUpdateHandlesMutation } from '@/lib/requests/profileData'
-import { RootState } from '@/lib/store'
-import { useAppDispatch, useAppSelector } from '@/lib/hooks'
-import { setUserInfo } from '@/lib/slices/user'
+import { useAppSelector } from '@/lib/hooks'
+import { toast } from 'react-toastify'
 
 const Page = () => {
     const { data: userData, error, isLoading } = useGetHandlesQuery({});
-    const { isSignedIn, username, isLoaded } = useAppSelector((state: any) => state.signedIn);
+    const { isSignedIn, isLoaded } = useAppSelector((state: any) => state.signedIn);
     const [leetcodeUsername, setLeetcodeUsername] = useState('');
     const [codeforcesUsername, setCodeforcesUsername] = useState('');
     const [codechefUsername, setCodechefUsername] = useState('');
     const [gfgUsername, setGfgUsername] = useState('');
     const [updateHandles, { data: updateData, error: updateError, isLoading: isUpdating }] = useUpdateHandlesMutation();
-    const [showSuccess, setShowSuccess] = useState(false);
 
     const handleSubmit = () => {
         const data = {
@@ -38,8 +36,7 @@ const Page = () => {
 
     useEffect(() => {
         if (updateData && !updateError) {
-            setShowSuccess(true);
-            setTimeout(() => setShowSuccess(false), 2500);
+            toast.success('Profile updated successfully!');
         }
     }, [updateData, updateError]);
 
@@ -56,12 +53,6 @@ const Page = () => {
             {isUpdating && (
                 <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-20">
                     <Loader />
-                </div>
-            )}
-            {/* Success message */}
-            {showSuccess && (
-                <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-green-500 text-white px-6 py-2 rounded shadow-lg z-30 transition">
-                    Profile updated successfully!
                 </div>
             )}
             <div className="w-full max-w-md mx-auto bg-white p-4 relative z-10">

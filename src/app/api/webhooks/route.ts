@@ -49,11 +49,10 @@ export async function POST(req: Request) {
   // Do something with payload
   // For this guide, log payload to console
   const { id } = evt.data
-  const eventType = evt.type
   if (evt.type === 'user.created') {
     const { username, image_url, first_name, last_name } = evt.data
     await sql`INSERT INTO users(id,username,avatar,first,last) VALUES(${id},${username},${image_url},${first_name},${last_name})`;
-    await sql`INSERT INTO handles(id,leetcode,codeforces,codechef,gfg) VALUES(${id},'_','_','_','_')`;
+    await sql`INSERT INTO handles(id,leetcode,codeforces,codechef,gfg) VALUES(${id},'','','','')`;
   }else if(evt.type === 'user.updated'){
     const { username, image_url, first_name, last_name } = evt.data
     await sql`UPDATE users SET username = ${username}, avatar = ${image_url}, first = ${first_name}, last = ${last_name} WHERE id = ${id}`;

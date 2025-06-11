@@ -1,7 +1,11 @@
-import { UserData } from "@/types/model";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-const initialState:UserData = {
+type UserName=
+{leetcodeHandle:string;
+  codeforcesHandle:string;
+  codechefHandle:string;
+  gfgHandle:string;}
+const initialState:UserName = {
   leetcodeHandle:'',
   codeforcesHandle:'',
   codechefHandle:'',
@@ -12,8 +16,8 @@ const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    setUserInfo: (state, action: PayloadAction<UserData>) => {
-      return action.payload;
+    setUserInfo: (state, action: PayloadAction<UserName>) => {
+      state=action.payload;
     }
     
   },

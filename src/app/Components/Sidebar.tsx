@@ -1,15 +1,13 @@
 'use client'
 import Link from 'next/link'
 import React from 'react'
-import { UserPen, UserPlus, UserSearch } from 'lucide-react'
-import Loader from './Loader'
-import { useSelector } from 'react-redux'
+import { User, UserPen, UserPlus, UserSearch } from 'lucide-react'
 import { useAppSelector } from '@/lib/hooks'
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = React.useState(false)
-  const { isSignedIn, username, isLoaded } = useAppSelector((state: any) => state.signedIn);
-  
+  const { isSignedIn, username } = useAppSelector((state: any) => state.signedIn);
+
   return (
     <div className='flex flex-col gap-16 relative'>
       <button
@@ -53,7 +51,7 @@ const Sidebar = () => {
         }`}>
         {isSignedIn && <Link href={`/profile/${username}`} className="text-2xl font-bold flex gap-2 justify-center items-center group transition-all duration-300 hover:-translate-y-[2px]">
           <div className=" rounded-lg p-1 border-solid cursor-pointer border-[2.5px] bg-white border-black outline-none focus-visible:outline-0 w-fit transition-all duration-300 group-hover:shadow-[2px_2px_0px_0px_rgba(0,0,0)] ">
-            <UserSearch className="w-7 h-7" />
+            <User className="w-7 h-7" />
           </div>
           <span className=" whitespace-nowrap flex items-center transition-all duration-300 group-hover:[text-shadow:1px_1px_1px_0px_rgba(0,0,0)]">
             Dashboard

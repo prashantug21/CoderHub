@@ -1,4 +1,4 @@
-import { isSignedIn, UserData } from "@/types/model";
+import { isSignedIn } from "@/types/model";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 const initialState:isSignedIn = {

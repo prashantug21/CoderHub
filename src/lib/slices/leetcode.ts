@@ -1,6 +1,5 @@
 import { LeetCodeData } from "@/types/model";
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import LeetCode from "leetcode-query";
+import { createSlice } from "@reduxjs/toolkit";
 
 
 

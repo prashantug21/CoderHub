@@ -46,14 +46,6 @@ export type GFGData={
     hard: number | null;
     total: number | null;
 }
-
-export type UserData={  
-    leetcodeHandle: string | null;
-    codeforcesHandle: string | null;
-    codechefHandle: string | null;
-    gfgHandle: string | null;
-}
-
 export type isSignedIn = {
     isSignedIn: boolean |undefined;
     isLoaded: boolean;
@@ -65,3 +57,31 @@ export interface Friend extends UserData {
     id: string;
     username: string;
 }
+export interface PlatformData {
+    status: 'ok' | 'error';
+    easy: number;
+    medium: number;
+    hard: number;
+    total: number;
+    currentRating?: number;
+    maxRating?: number;
+    contestHistory?: Array<{
+        date: string;
+        rating: number;
+        contestName: string;
+    }>;
+}
+export interface UserData {
+    0: PlatformData; // CodeChef
+    1: PlatformData; // Codeforces
+    2: PlatformData; // GeeksforGeeks
+    3: PlatformData; // Leetcode
+    4: {
+        leetcode: string;
+        codeforces: string;
+        gfg: string;
+        codechef: string;
+    };
+    message?: string;
+}
+
