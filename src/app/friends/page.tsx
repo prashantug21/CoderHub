@@ -43,6 +43,8 @@ export default function FriendsPage() {
                     >
                         <div className="flex items-center gap-4">
                             <Image
+                                width={48}
+                                height={48}
                                 src={friend.avatar || "/default-avatar.png"}
                                 alt={friend.username}
                                 className="w-12 h-12 rounded-full object-cover border"
@@ -50,16 +52,16 @@ export default function FriendsPage() {
                             <div>
                                 <div className="font-semibold text-sm sm:text-lg">{friend.first} {friend.last} <Link href={`/profile//${friend.username}`} className="text-gray-500">@{friend.username}</Link></div>
                                 <div className="sm:text-sm text-gray-500">{friend.email}</div>
-                                <div className="flex gap-2 mt-1 items-center sm:gap-10">
-                                    <a href={`https://www.codechef.com/users/${friend.codechef}`} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline"><Image src={'/codechef.svg'} alt="codechef" width={24} height={24} /></a>
-                                    <a href={`https://codeforces.com/profile/${friend.codeforces}`} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline"><Image src={'/codeforces.svg'} alt="codeforces" width={24} height={24} /></a>
-                                    <a href={`https://leetcode.com/${friend.leetcode}`} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline"><Image src={'/leetcode.svg'} alt="leetcode" width={24} height={24} /></a>
-                                    <a href={`https://www.geeksforgeeks.org/user/${friend.gfg}`} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline"><Image src={'/gfg.svg'} alt="gfg" width={24} height={24} /></a>
+                                <div className="flex flex-wrap gap-2 mt-1 items-center sm:gap-5">
+                                    <a href={`https://www.codechef.com/users/${friend.codechef}`} target="_blank" rel="noopener noreferrer" className="text-xs sm:text-sm text-blue-600 flex items-center hover:underline"><Image src={'/codechef.svg'} alt="codechef" width={24} height={24} />{friend.codechef}</a>
+                                    <a href={`https://codeforces.com/profile/${friend.codeforces}`} target="_blank" rel="noopener noreferrer" className="text-xs sm:text-sm text-blue-600 flex items-center hover:underline"><Image src={'/codeforces.svg'} alt="codeforces" width={24} height={24} />{friend.codeforces}</a>
+                                    <a href={`https://leetcode.com/${friend.leetcode}`} target="_blank" rel="noopener noreferrer" className="text-xs sm:text-sm text-blue-600 flex items-center hover:underline"><Image src={'/leetcode.svg'} alt="leetcode" width={24} height={24} />{friend.leetcode}</a>
+                                    <a href={`https://www.geeksforgeeks.org/user/${friend.gfg}`} target="_blank" rel="noopener noreferrer" className="text-xs sm:text-sm text-blue-600 flex items-center hover:underline"><Image src={'/gfg.svg'} alt="gfg" width={24} height={24} />{friend.gfg}</a>
                                 </div>
                             </div>
                         </div>
                         <button
-                            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition disabled:opacity-60"
+                            className="  text-white rounded  transition disabled:opacity-60"
                             disabled={isDeleting && deletingId === friend.id}
                             onClick={async () => {
                                 setDeletingId(friend.id);
@@ -68,7 +70,7 @@ export default function FriendsPage() {
                                 refetch();
                             }}
                         >
-                            {isDeleting && deletingId === friend.id ? "Removing..." : "Remove"}
+                            <span className="button_top border-red-100 text-red-800">{isDeleting && deletingId === friend.id ? "Removing..." : "Remove"}</span>
                         </button>
                     </li>
                 ))}

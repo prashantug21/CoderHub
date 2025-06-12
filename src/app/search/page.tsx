@@ -1,7 +1,6 @@
 "use client";
-import { useAppSelector } from "@/lib/hooks";
-import { useAddFriendMutation } from "@/lib/requests/friendData";
 import Image from "next/image";
+import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
 ;
@@ -17,19 +16,12 @@ type SearchResult = {
 };
 
 export default function SearchPage() {
-    const signedIn = useAppSelector((state: any) => state.signedIn);
     const [query, setQuery] = useState("");
     const [results, setResults] = useState<SearchResult[]>([]);
     const [loading, setLoading] = useState(false);
     const [touched, setTouched] = useState(false);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
-    const [addFriend, { isSuccess: addSuccess }] = useAddFriendMutation();
-    useEffect(() => {
-        if (addSuccess) {
-            toast.success("Friend added!");
-        }
-    }
-        , [addSuccess]);
+
 
     useEffect(() => {
         if (!query.trim()) {
@@ -99,13 +91,15 @@ export default function SearchPage() {
                             <Image
                                 src={user.avatar || "/default-avatar.png"}
                                 alt={user.username || "avatar"}
+                                width={48}
+                                height={48}
                                 className="w-12 h-12 rounded-full object-cover border"
                             />
                             <div>
                                 <div className="font-semibold text-lg">
                                     {user.first} {user.last}{" "}
                                     {user.username && (
-                                        <span className="text-gray-500">@{user.username}</span>
+                                        <Link href={`/profile/${user.username}`} className="text-gray-500">@{user.username}</Link>
                                     )}
                                 </div>
                                 <div className="flex gap-2 mt-1 flex-wrap">
@@ -158,16 +152,6 @@ export default function SearchPage() {
                                     )}
                                 </div>
                             </div>
-                            {signedIn.isSignedIn && signedIn.username !== user.username && (
-                                <button
-                                    className="float-right"
-                                    onClick={() => {
-                                        addFriend({ username: user.username })
-                                    }}
-                                >
-                                    <span className="button_top">Add Friend</span>
-                                </button>
-                            )}
                         </li>
                     ))}
                 </ul>

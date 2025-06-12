@@ -81,6 +81,10 @@ export interface UserData {
         codeforces: string;
         gfg: string;
         codechef: string;
+        avatar: string;
+        username: string;
+        first: string;
+        last: string;
     };
     message?: string;
 }

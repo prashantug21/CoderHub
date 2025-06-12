@@ -5,14 +5,33 @@ import { User, UserPen, UserPlus, UserSearch } from 'lucide-react'
 import { useAppSelector } from '@/lib/hooks'
 
 const Sidebar = () => {
+  const sidebarRef = React.useRef<HTMLDivElement>(null)
+  const menuButtonRef = React.useRef<HTMLButtonElement>(null)
   const [isOpen, setIsOpen] = React.useState(false)
   const { isSignedIn, username } = useAppSelector((state: any) => state.signedIn);
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (sidebarRef.current && !sidebarRef.current.contains(event.target as Node) &&
+        menuButtonRef.current && !menuButtonRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className='flex flex-col gap-16 relative'>
       <button
+        ref={menuButtonRef}
         className={`group flex items-center justify-center relative z-10 [transition:all_0.5s_ease] rounded-lg p-1 border-solid  cursor-pointer border-1 bg-[white] border-[#000000] outline-none focus-visible:outline-0`}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsOpen(prev => !prev);
+        }}
       >
         <span className='bg-white rounded-lg'>
           <svg
@@ -38,16 +57,16 @@ const Sidebar = () => {
           </svg>
         </span>
       </button>
-      <div className={`flex flex-col gap-4 
-          absolute top-16 left-[] 
-          bg-white p-4 rounded-lg 
+      <div ref={sidebarRef} className={`flex flex-col gap-4 
+          absolute top-16
+          bg-white  rounded-lg 
           shadow-[8px_8px_0px_0px_rgba(0,0,0)] 
-          border-black border-solid border-2
+          
           transition-all duration-300 ease-in-out
           items-start
           ${isOpen
-          ? 'opacity-100 translate-y-0 h-auto'
-          : 'opacity-0 -translate-y-4 h-0  p-0 overflow-hidden pointer-events-none'
+          ? 'opacity-100 translate-y-0 h-auto p-4 border-black border-solid border-2'
+          : ' -translate-y-4 h-0 p-0 overflow-hidden pointer-events-none'
         }`}>
         {isSignedIn && <Link href={`/profile/${username}`} className="text-2xl font-bold flex gap-2 justify-center items-center group transition-all duration-300 hover:-translate-y-[2px]">
           <div className=" rounded-lg p-1 border-solid cursor-pointer border-[2.5px] bg-white border-black outline-none focus-visible:outline-0 w-fit transition-all duration-300 group-hover:shadow-[2px_2px_0px_0px_rgba(0,0,0)] ">

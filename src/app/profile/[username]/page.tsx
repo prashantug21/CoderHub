@@ -1,10 +1,8 @@
 'use client'
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, Suspense, lazy } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChartConfig, ChartContainer } from "@/components/ui/chart";
-import { CartesianGrid, Line, LineChart, Tooltip, XAxis } from "recharts";
 import Image from "next/image";
 import { toast } from "react-toastify";
 import Loader from "@/app/Components/Loader";
@@ -12,29 +10,28 @@ import { useAppSelector } from "@/lib/hooks";
 import { useAddFriendMutation, useFriendCheckQuery } from "@/lib/requests/friendData";
 import { PlatformData, UserData } from "@/types/model";
 
+// Dynamic imports for heavy components
+const RatingChart = lazy(() => import('@/app/Components/RatingChart'));
 
-
-// Constants
-const CHART_CONFIG: ChartConfig = {
-    rating: {
-        label: "Rating",
-        color: "#000000",
-    },
+// Dynamic import for chart libraries (only load when needed)
+const loadChartLibraries = () => {
+    return Promise.all([
+        import("@/components/ui/chart"),
+        import("recharts")
+    ]);
 };
 
+// Constants
 const PLATFORMS = [
     { name: "CodeChef", index: 0, icon: "/codechef.svg", urlBase: "https://www.codechef.com/users/" },
     { name: "Codeforces", index: 1, icon: "/codeforces.svg", urlBase: "https://codeforces.com/profile/" },
     { name: "Leetcode", index: 3, icon: "/leetcode.svg", urlBase: "https://www.leetcode.com/" },
 ] as const;
 
-
 // Helper functions
 const getSafeData = (data: PlatformData | undefined): PlatformData =>
     data?.status === "ok" ? data : { status: 'error', easy: 0, medium: 0, hard: 0, total: 0 };
 
-const formatRating = (rating: number | undefined): string =>
-    rating ? Math.round(rating).toString() : "-";
 
 // Components
 const ErrorMessage = ({ message }: { message: string }) => (
@@ -120,95 +117,16 @@ const AddFriendButton = ({
     </div>
 );
 
-const RatingChart = ({
-    platforms,
-    selectedIndex,
-    onIndexChange
-}: {
-    platforms: Array<{ name: string; index: number; data: PlatformData }>;
-    selectedIndex: number;
-    onIndexChange: (index: number) => void;
-}) => {
-    const currentPlatform = platforms.find(p => p.index === selectedIndex) || platforms[0];
-    const chartData = currentPlatform?.data?.contestHistory || [];
-    const currentRating = formatRating(currentPlatform?.data?.currentRating);
-    const maxRating = formatRating(currentPlatform?.data?.maxRating);
-
-    return (
-        <Card className="w-full p-2 shadow-[8px_8px_0px_0px_rgba(0,0,0)] rounded-2xl border-2 border-black h-full">
-            <CardHeader>
-                <CardTitle className="flex flex-col gap-2">
-                    <div className="flex gap-2 overflow-x-auto scrollbar-hidden py-2">
-                        {platforms.map((platform) => (
-                            <button key={platform.name}>
-                                <span
-                                    className={`button_top ${selectedIndex === platform.index ? 'bg-gray-200' : ''}`}
-                                    onClick={() => onIndexChange(platform.index)}
-                                >
-                                    {platform.name}
-                                </span>
-                            </button>
-                        ))}
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                        <span className="text-blue-500 font-semibold">
-                            Current Rating: {currentRating}
-                        </span>
-                        <span className="text-green-500 font-semibold">
-                            Max Rating: {maxRating}
-                        </span>
-                    </div>
-                </CardTitle>
-            </CardHeader>
-            <CardContent>
-                {chartData.length > 0 ? (
-                    <ChartContainer config={CHART_CONFIG} className="aspect-auto h-[300px]">
-                        <LineChart
-                            accessibilityLayer
-                            className="max-h-fit"
-                            data={chartData}
-                            margin={{ left: 12, right: 12 }}
-                        >
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis
-                                dataKey="date"
-                                tickLine={false}
-                                axisLine={false}
-                                tickMargin={8}
-                                tickFormatter={(value) => value.slice(5)}
-                            />
-                            <Tooltip
-                                cursor={false}
-                                content={({ payload }) => {
-                                    if (!payload || payload.length === 0) return null;
-                                    const { rating, contestName } = payload[0].payload;
-                                    return (
-                                        <div className="bg-white p-2 rounded-md shadow-md">
-                                            <p className="font-semibold">{contestName}</p>
-                                            <p className="font-bold">Rating: {Math.round(rating)}</p>
-                                        </div>
-                                    );
-                                }}
-                            />
-                            <Line
-                                dataKey="rating"
-                                stroke="#000000"
-                                strokeWidth={2}
-                                dot={{ fill: "#000000", r: 2 }}
-                            />
-                        </LineChart>
-                    </ChartContainer>
-                ) : (
-                    <div className="flex justify-center items-center h-[300px]">
-                        <p className="text-gray-500">
-                            {chartData.length === 0 ? "No contest history available" : "No platform data available for rating chart"}
-                        </p>
-                    </div>
-                )}
-            </CardContent>
-        </Card>
-    );
-};
+// Chart loading fallback
+const ChartFallback = () => (
+    <Card className="w-full p-2 shadow-[8px_8px_0px_0px_rgba(0,0,0)] rounded-2xl border-2 border-black h-full">
+        <CardContent>
+            <div className="flex justify-center items-center h-[300px]">
+                <div className="animate-pulse text-gray-500">Loading chart...</div>
+            </div>
+        </CardContent>
+    </Card>
+);
 
 // Main component
 const UserProfilePage = () => {
@@ -216,6 +134,7 @@ const UserProfilePage = () => {
     const { username } = useParams<{ username: string }>();
     const signedIn = useAppSelector((state: any) => state.signedIn);
     const [selectedPlatformIndex, setSelectedPlatformIndex] = useState(0);
+    const [showChart, setShowChart] = useState(false);
 
     // API calls
     const userQuery = useQuery({
@@ -243,6 +162,18 @@ const UserProfilePage = () => {
             toast.success("Friend added!");
         }
     }, [addSuccess]);
+
+    // Load chart when user data is available and user scrolls down
+    useEffect(() => {
+        if (userQuery.data && !showChart) {
+            const timer = setTimeout(() => {
+                setShowChart(true);
+                // Preload chart libraries
+                loadChartLibraries();
+            }, 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [userQuery.data, showChart]);
 
     // Memoized values
     const platformData = useMemo(() => {
@@ -294,12 +225,27 @@ const UserProfilePage = () => {
 
     return (
         <div className="w-full max-w-7xl mx-auto px-4 py-8">
-            {showAddFriendButton && (
-                <AddFriendButton
-                    onAddFriend={handleAddFriend}
-                    isSignedIn={signedIn.isSignedIn}
-                />
-            )}
+            <div className="w-full bg-white shadow-md rounded-lg p-6 flex items-center justify-between mb-8">
+                <div className="flex items-center gap-4">
+                    <Image
+                        src={userQuery.data[4].avatar || "/default-avatar.png"}
+                        alt={`${userQuery.data[4].username}'s avatar`}
+                        width={64}
+                        height={64}
+                        className="rounded-full border-2 border-black"
+                    />
+                    <div className="flex flex-col">
+                        <h1 className="text-2xl font-bold">{userQuery.data[4].first} {userQuery.data[4].last}</h1>
+                        <p className="text-gray-600">@{userQuery.data[4].username}</p>
+                    </div>
+                </div>
+                {showAddFriendButton && (
+                    <AddFriendButton
+                        onAddFriend={handleAddFriend}
+                        isSignedIn={signedIn.isSignedIn}
+                    />
+                )}
+            </div>
 
             {/* Platform Profile Links */}
             <div className="w-full grid lg:flex lg:justify-between grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 my-8 justify-items-center">
@@ -328,13 +274,19 @@ const UserProfilePage = () => {
                 />
             </div>
 
-            {/* Rating Chart */}
+            {/* Rating Chart - Dynamically Loaded */}
             <div className="w-full py-8">
-                <RatingChart
-                    platforms={chartPlatforms}
-                    selectedIndex={selectedPlatformIndex}
-                    onIndexChange={setSelectedPlatformIndex}
-                />
+                {showChart ? (
+                    <Suspense fallback={<ChartFallback />}>
+                        <RatingChart
+                            platforms={chartPlatforms}
+                            selectedIndex={selectedPlatformIndex}
+                            onIndexChange={setSelectedPlatformIndex}
+                        />
+                    </Suspense>
+                ) : (
+                    <ChartFallback />
+                )}
             </div>
         </div>
     );

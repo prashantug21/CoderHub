@@ -26,13 +26,14 @@ const fetchWithTimeout = (url: string, options: RequestInit = {}, timeout = 5000
 export async function POST(req: NextRequest): Promise<NextResponse> {
     try {
         const { handle } = await req.json();
-        const res = await sql`SELECT handles.* FROM handles JOIN users ON handles.id = users.id WHERE users.username = ${handle}`;
+        const res = await sql`SELECT handles.*, users.* FROM handles JOIN users ON handles.id = users.id WHERE users.username = ${handle}`;
         
         if (res.length === 0) {
             return NextResponse.json({ message: 'User handle not found' }, { status: 404 });
         }
 
         const userHandles = res[0];
+        
         
         // Prepare all API calls with error handling
         const apiCalls = [];
@@ -226,7 +227,11 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
             leetcode: userHandles.leetcode,
             codechef: userHandles.codechef,
             codeforces: userHandles.codeforces,
-            gfg: userHandles.gfg
+            gfg: userHandles.gfg,
+            avatar: userHandles.avatar,
+            first: userHandles.first,
+            last: userHandles.last,
+            username: userHandles.username,
         });
 
         return NextResponse.json(results, { status: 200 });
