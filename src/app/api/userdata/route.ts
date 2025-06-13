@@ -68,7 +68,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
         if (userHandles.gfg) {
             apiCalls.push(
-                fetchWithTimeout(`https://www.geeksforgeeks.org/gfg-assets/_next/data/FYklEAyXivT1T8T9JuA9B/user/${userHandles.gfg}.json`)
+                fetchWithTimeout(`https://geeks-for-geeks-api.vercel.app/${userHandles.gfg}`)
                     .then(res => res.json())
                     .catch(() => ({}))
             );
@@ -177,11 +177,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         }
 
         // GFG processing
-        if (gfg.pageProps?.userHandle !== undefined) {
-            const submissions = gfg.pageProps.userSubmissionsInfo;
-            const easyCount = Object.keys(submissions.Easy || {}).length + Object.keys(submissions.Basic || {}).length;
-            const mediumCount = Object.keys(submissions.Medium || {}).length;
-            const hardCount = Object.keys(submissions.Hard || {}).length;
+        if (gfg?.error!== "User not found") {
+            const easyCount =gfg.solvedStats?.easy.count +gfg.solvedStats?.basic.count || 0;
+            const mediumCount = gfg.solvedStats?.medium.count || 0;
+            const hardCount = gfg.solvedStats?.hard.count || 0;
             
             results.push({
                 status: "ok",
