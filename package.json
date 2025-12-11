@@ -9,13 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@clerk/nextjs": "^6.12.0",
+    "@clerk/nextjs": "^6.36.2",
     "@neondatabase/serverless": "^0.10.1",
     "@reduxjs/toolkit": "^2.5.1",
     "@tanstack/react-query": "^5.66.9",
     "clsx": "^2.1.1",
     "lucide-react": "^0.475.0",
-    "next": "^15.2.1-canary.4",
+    "next": "^15.5.7",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-redux": "^9.2.0",
@@ -40,6 +40,10 @@
   "overrides": {
     "@types/react": "19.0.10",
     "@types/react-dom": "19.0.4",
-    "react-is": "^19.0.0-rc-69d4b800-20241021"
+    "react-is": "^19.0.0-rc-69d4b800-20241021",
+    "@eslint/plugin-kit": "0.5.0",
+    "glob": "10.5.0",
+    "js-yaml": "4.1.1",
+    "brace-expansion": "1.1.12"
   }
 }
